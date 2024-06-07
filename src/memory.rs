@@ -1,6 +1,6 @@
-use num::{FromPrimitive, Integer, ToPrimitive};
-use num::traits::{WrappingAdd, WrappingSub};
 use crate::error::TmiError;
+use num::traits::{WrappingAdd, WrappingSub};
+use num::{FromPrimitive, Integer, ToPrimitive};
 
 pub trait Memory: std::fmt::Display {
     fn access(&self) -> Result<u8, TmiError>;
@@ -11,7 +11,9 @@ pub trait Memory: std::fmt::Display {
     fn dec(&mut self);
 }
 
-pub struct InfMemory<T: ToPrimitive + FromPrimitive + Integer + Clone + std::fmt::Display> {
+pub struct InfMemory<
+    T: ToPrimitive + FromPrimitive + WrappingAdd + WrappingSub + Integer + std::fmt::Display + Clone,
+> {
     memory: Vec<T>,
     pos: usize,
     len: usize,
@@ -27,7 +29,16 @@ impl InfMemory<i8> {
     }
 }
 
-impl<T: ToPrimitive + FromPrimitive + Integer + std::fmt::Display + Clone> std::fmt::Display for InfMemory<T> {
+impl<
+        T: ToPrimitive
+            + FromPrimitive
+            + WrappingAdd
+            + WrappingSub
+            + Integer
+            + std::fmt::Display
+            + Clone,
+    > std::fmt::Display for InfMemory<T>
+{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for i in &self.memory {
             write!(f, "{} ", i)?;
@@ -36,18 +47,28 @@ impl<T: ToPrimitive + FromPrimitive + Integer + std::fmt::Display + Clone> std::
     }
 }
 
-impl<T: ToPrimitive + FromPrimitive + Integer + std::fmt::Display + Clone> Memory for InfMemory<T> {
+impl<
+        T: ToPrimitive
+            + FromPrimitive
+            + WrappingAdd
+            + WrappingSub
+            + Integer
+            + std::fmt::Display
+            + Clone,
+    > Memory for InfMemory<T>
+{
     fn access(&self) -> Result<u8, TmiError> {
-        self.memory.get(self.pos).unwrap().to_u8().ok_or(TmiError {})
+        self.memory
+            .get(self.pos)
+            .unwrap()
+            .to_u8()
+            .ok_or(TmiError {})
     }
 
     fn set(&mut self, val: u8) {
-        self.memory[self.pos] == T::from_u8(val).unwrap();
+        self.memory[self.pos] = T::from_u8(val).unwrap();
     }
     fn shiftl(&mut self) -> Result<(), TmiError> {
-        if self.pos < 0 {
-            return Err(TmiError{});
-        }
         self.pos -= 1;
         Ok(())
     }
@@ -60,9 +81,10 @@ impl<T: ToPrimitive + FromPrimitive + Integer + std::fmt::Display + Clone> Memor
         Ok(())
     }
     fn inc(&mut self) {
-        self.memory[self.pos].inc();
+        self.memory[self.pos] = self.memory[self.pos].wrapping_add(&T::from_u8(1).unwrap());
     }
+
     fn dec(&mut self) {
-        self.memory[self.pos].dec();
+        self.memory[self.pos] = self.memory[self.pos].wrapping_sub(&T::from_u8(1).unwrap());
     }
 }

@@ -1,10 +1,10 @@
-use std::collections::VecDeque;
 use crate::error::TmiError;
 use crate::operation::*;
+use std::collections::VecDeque;
 
 mod error;
-mod operation;
 pub mod memory;
+mod operation;
 
 pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
     let mut ops: VecDeque<Operation> = VecDeque::new();
@@ -18,7 +18,7 @@ pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
             b'.' => ops.push_back(Operation::Access),
             b',' => ops.push_back(Operation::Set),
             b'[' => ops.push_back(Operation::Loop(parse_loop(file)?)),
-            b']' => { return Err(TmiError {}) },
+            b']' => return Err(TmiError {}),
             _ => (),
         }
     }

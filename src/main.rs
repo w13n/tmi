@@ -11,16 +11,14 @@ fn main() {
     let mut contents = fs::read(path).unwrap();
     let mut memory: memory::InfMemory<i8> = memory::InfMemory::new();
 
-
     println!("parsing file");
 
     let ops = parse(&mut contents).unwrap();
 
-
     println!("running file");
 
     for op in ops {
-        op.execute(&mut Box::new(&mut memory), &mut input).unwrap();
+        op.execute(&mut memory, &mut input).unwrap();
     }
 
     println!("mem: {}", memory);
