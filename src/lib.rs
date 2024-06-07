@@ -1,44 +1,45 @@
 use std::collections::VecDeque;
+use crate::error::TmiError;
 use crate::operation::*;
 
 mod error;
 mod operation;
 pub mod memory;
 
-pub fn parse(file: &mut Vec<u8>) -> VecDeque<Box<dyn Operation>> {
-    let mut ops: VecDeque<Box<dyn Operation>> = VecDeque::new();
+pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
+    let mut ops: VecDeque<Operation> = VecDeque::new();
     while !file.is_empty() {
         let cmd = file.remove(0);
         match cmd {
-            b'>' => ops.push_back(Box::new(ShiftR::new())),
-            b'<' => ops.push_back(Box::new(ShiftL::new())),
-            b'+' => ops.push_back(Box::new(Inc::new())),
-            b'-' => ops.push_back(Box::new(Dec::new())),
-            b'.' => ops.push_back(Box::new(Output::new())),
-            b',' => ops.push_back(Box::new(Output::new())),
-            b'[' => ops.push_back(Box::new(parse_loop(file))),
-            b']' => panic!("too many ]"),
+            b'>' => ops.push_back(Operation::ShiftR),
+            b'<' => ops.push_back(Operation::ShiftL),
+            b'+' => ops.push_back(Operation::Inc),
+            b'-' => ops.push_back(Operation::Dec),
+            b'.' => ops.push_back(Operation::Access),
+            b',' => ops.push_back(Operation::Set),
+            b'[' => ops.push_back(Operation::Loop(parse_loop(file)?)),
+            b']' => { return Err(TmiError {}) },
             _ => (),
         }
     }
-    ops
+    Ok(ops)
 }
 
-fn parse_loop(file: &mut Vec<u8>) -> Loop {
-    let mut ops: VecDeque<Box<dyn Operation>> = VecDeque::new();
+fn parse_loop(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
+    let mut ops: VecDeque<Operation> = VecDeque::new();
     let mut cmd = file.remove(0);
     while cmd != b']' {
         match cmd {
-            b'>' => ops.push_back(Box::new(ShiftR::new())),
-            b'<' => ops.push_back(Box::new(ShiftL::new())),
-            b'+' => ops.push_back(Box::new(Inc::new())),
-            b'-' => ops.push_back(Box::new(Dec::new())),
-            b'.' => ops.push_back(Box::new(Output::new())),
-            b',' => ops.push_back(Box::new(Output::new())),
-            b'[' => ops.push_back(Box::new(parse_loop(file))),
+            b'>' => ops.push_back(Operation::ShiftR),
+            b'<' => ops.push_back(Operation::ShiftL),
+            b'+' => ops.push_back(Operation::Inc),
+            b'-' => ops.push_back(Operation::Dec),
+            b'.' => ops.push_back(Operation::Access),
+            b',' => ops.push_back(Operation::Set),
+            b'[' => ops.push_back(Operation::Loop(parse_loop(file)?)),
             _ => (),
         };
         cmd = file.remove(0);
     }
-    Loop::new(ops)
+    Ok(ops)
 }

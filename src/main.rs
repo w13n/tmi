@@ -7,22 +7,21 @@ fn main() {
     let mut args = env::args();
     args.next();
     let path = args.next().unwrap();
-    let mut input = args.next().unwrap().as_bytes().into();
+    let mut input = args.next().unwrap().as_bytes().to_vec().into();
     let mut contents = fs::read(path).unwrap();
     let mut memory: memory::InfMemory<i8> = memory::InfMemory::new();
-    let mut output = Vec::new();
 
 
     println!("parsing file");
 
-    let ops = parse(&mut contents);
+    let ops = parse(&mut contents).unwrap();
+
 
     println!("running file");
 
     for op in ops {
-        op.op(&mut output, &mut input, &mut memory);
+        op.execute(&mut Box::new(&mut memory), &mut input).unwrap();
     }
 
     println!("mem: {}", memory);
-    println!("{}", String::from_utf8(output).unwrap());
 }
