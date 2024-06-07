@@ -19,8 +19,8 @@ pub struct InfMemory<
     len: usize,
 }
 
-impl InfMemory<i8> {
-    pub fn new() -> InfMemory<i8> {
+impl InfMemory<u8> {
+    pub fn new() -> InfMemory<u8> {
         InfMemory {
             memory: vec![0],
             pos: 0usize,
@@ -62,7 +62,7 @@ impl<
             .get(self.pos)
             .unwrap()
             .to_u8()
-            .ok_or(TmiError {})
+            .ok_or(TmiError::MemoryAccessU8ConversionError)
     }
 
     fn set(&mut self, val: u8) {

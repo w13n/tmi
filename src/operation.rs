@@ -20,7 +20,7 @@ impl Operation {
                 Ok(())
             }
             Operation::Set => {
-                mem.set(input.pop_front().ok_or(TmiError {})?);
+                mem.set(input.pop_front().unwrap_or_default());
                 Ok(())
             }
             Operation::ShiftL => mem.shiftl(),

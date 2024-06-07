@@ -18,7 +18,7 @@ pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
             b'.' => ops.push_back(Operation::Access),
             b',' => ops.push_back(Operation::Set),
             b'[' => ops.push_back(Operation::Loop(parse_loop(file)?)),
-            b']' => return Err(TmiError {}),
+            b']' => return Err(TmiError::UnmatchedLoopClose),
             _ => (),
         }
     }

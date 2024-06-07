@@ -1,5 +1,8 @@
 #[derive(Debug)]
-pub struct TmiError {}
+pub enum TmiError {
+    MemoryAccessU8ConversionError,
+    UnmatchedLoopClose,
+}
 
 impl std::fmt::Display for TmiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
