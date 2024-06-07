@@ -14,6 +14,7 @@ pub trait Memory: std::fmt::Display {
 pub struct InfMemory<T: Integer + WrappingAdd + WrappingSub> {
     memory: Vec<T>,
     pos: usize,
+    len: usize,
 }
 
 impl InfMemory<i8> {
@@ -21,6 +22,7 @@ impl InfMemory<i8> {
         InfMemory {
             memory: vec![0],
             pos: 0usize,
+            len: 0usize,
         }
     }
 }
@@ -51,8 +53,9 @@ impl Memory for InfMemory<i8> {
     }
     fn shiftr(&mut self) {
         self.pos += 1;
-        if self.memory.len() <= self.pos {
+        if self.len <= self.pos {
             self.memory.push(0);
+            self.len += 1;
         }
     }
     fn inc(&mut self) {

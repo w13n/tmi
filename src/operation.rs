@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use crate::memory::*;
 
 pub trait Operation {
@@ -13,7 +14,7 @@ impl Inc {
 }
 
 impl Operation for Inc {
-    fn op(&self, output: &mut Vec<u8>, input: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
+    fn op(&self, _: &mut Vec<u8>, _: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
         mem.inc();
     }
 }
@@ -27,7 +28,7 @@ impl Dec {
 }
 
 impl Operation for Dec {
-    fn op(&self, output: &mut Vec<u8>, input: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
+    fn op(&self, _: &mut Vec<u8>, _: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
         mem.dec();
     }
 }
@@ -41,7 +42,7 @@ impl ShiftL {
 }
 
 impl Operation for ShiftL {
-    fn op(&self, output: &mut Vec<u8>, input: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
+    fn op(&self, _: &mut Vec<u8>, _: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
         mem.shiftl();
     }
 }
@@ -55,17 +56,17 @@ impl ShiftR {
 }
 
 impl Operation for ShiftR {
-    fn op(&self, output: &mut Vec<u8>, input: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
+    fn op(&self, _: &mut Vec<u8>, _: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
         mem.shiftr();
     }
 }
 
 pub struct Loop {
-    ops: Vec<Box<dyn Operation>>,
+    ops: VecDeque<Box<dyn Operation>>,
 }
 
 impl Loop {
-    pub fn new(ops: Vec<Box<dyn Operation>>) -> Loop {
+    pub fn new(ops: VecDeque<Box<dyn Operation>>) -> Loop {
         Loop { ops }
     }
 }
@@ -89,7 +90,7 @@ impl Input {
 }
 
 impl Operation for Input {
-    fn op(&self, output: &mut Vec<u8>, input: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
+    fn op(&self, _: &mut Vec<u8>, input: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
         mem.set(input.remove(0));
     }
 }
@@ -103,7 +104,7 @@ impl Output {
 }
 
 impl Operation for Output {
-    fn op(&self, output: &mut Vec<u8>, input: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
+    fn op(&self, output: &mut Vec<u8>, _: &mut Vec<u8>, mem: &mut InfMemory<i8>) {
         output.push(mem.access());
     }
 }

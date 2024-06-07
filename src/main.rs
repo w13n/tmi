@@ -15,7 +15,7 @@ fn main() {
 
     println!("parsing file");
 
-    let ops = tmi::parse(&mut contents);
+    let ops = parse(&mut contents);
 
     println!("running file");
 
