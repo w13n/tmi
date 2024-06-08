@@ -5,6 +5,7 @@ use std::collections::VecDeque;
 mod error;
 pub mod memory;
 mod operation;
+mod cli;
 
 pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
     let mut ops: VecDeque<Operation> = VecDeque::new();
@@ -39,6 +40,9 @@ fn parse_loop(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
             b'[' => ops.push_back(Operation::Loop(parse_loop(file)?)),
             _ => (),
         };
+        if file.is_empty() {
+            return Err(TmiError::UnmatchedLoopOpen);
+        }
         cmd = file.remove(0);
     }
     Ok(ops)
