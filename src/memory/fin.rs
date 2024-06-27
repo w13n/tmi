@@ -1,7 +1,7 @@
 use crate::error::TmiError;
 use crate::memory::{Cell, Memory};
 
-pub struct FinMemory<T: Cell> {
+pub(crate) struct FinMemory<T: Cell> {
     memory: Vec<T>,
     pos: usize,
     size: usize,
@@ -26,8 +26,7 @@ impl<T: Cell> std::fmt::Display for FinMemory<T> {
     }
 }
 
-impl<T: Cell> Memory for FinMemory<T>
-{
+impl<T: Cell> Memory for FinMemory<T> {
     fn access(&self) -> Result<u8, TmiError> {
         self.memory[self.pos]
             .to_u8()

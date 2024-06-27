@@ -1,7 +1,7 @@
 use crate::error::TmiError;
 use crate::memory::{Cell, Memory};
 
-pub struct InfMemory<T: Cell> {
+pub(crate) struct InfMemory<T: Cell> {
     memory: Vec<T>,
     pos: usize,
     len: usize,
@@ -17,6 +17,12 @@ impl<T: Cell> InfMemory<T> {
     }
 }
 
+impl<T: Cell> Default for InfMemory<T> {
+    fn default() -> Self {
+        InfMemory::new()
+    }
+}
+
 impl<T: Cell> std::fmt::Display for InfMemory<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for i in &self.memory {
@@ -26,8 +32,7 @@ impl<T: Cell> std::fmt::Display for InfMemory<T> {
     }
 }
 
-impl<T: Cell> Memory for InfMemory<T>
-{
+impl<T: Cell> Memory for InfMemory<T> {
     fn access(&self) -> Result<u8, TmiError> {
         self.memory[self.pos]
             .to_u8()

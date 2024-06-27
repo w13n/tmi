@@ -2,10 +2,10 @@ use crate::error::TmiError;
 use crate::operation::*;
 use std::collections::VecDeque;
 
+pub mod cli;
 mod error;
 pub mod memory;
 mod operation;
-mod cli;
 
 pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
     let mut ops: VecDeque<Operation> = VecDeque::new();
