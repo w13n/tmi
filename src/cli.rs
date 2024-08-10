@@ -14,7 +14,7 @@ pub struct CArgs {
     /// number of memory cells to use (leave blank for dynamic sized memory)
     #[arg(short, long)]
     pub memory: Option<usize>,
-    /// cell size in bits (signed or unsigned)
+    /// cell size in bits (integer or unsigned)
     #[arg(value_enum, short, long, default_value_t = Cells::U8)]
     pub cells: Cells,
 }
@@ -22,13 +22,13 @@ pub struct CArgs {
 #[derive(Clone, ValueEnum)]
 pub enum Cells {
     U8,
-    S8,
+    I8,
     U16,
-    S16,
+    I16,
     U32,
-    S32,
+    I32,
     U64,
-    S64,
+    I64,
     U128,
-    S128,
+    I128,
 }

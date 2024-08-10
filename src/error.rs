@@ -3,7 +3,8 @@ pub enum TmiError {
     MemoryAccessU8ConversionError,
     UnmatchedLoopClose,
     UnmatchedLoopOpen,
-    MemoryBoundsExceeded,
+    MemoryLimitExceeded,
+    MemoryUnderflow,
 }
 
 impl std::fmt::Display for TmiError {
@@ -24,8 +25,12 @@ impl std::fmt::Display for TmiError {
                     "parsing error: a '[' without a corresponding ']' was found"
                 )
             }
-            TmiError::MemoryBoundsExceeded => {
-                write!(f, "runtime error: the memory limits have been exceeded")
+            TmiError::MemoryLimitExceeded => {
+                write!(f, "runtime error: the memory limit has been exceeded")
+            }
+
+            TmiError::MemoryUnderflow => {
+                write!(f, "runtime error: the program attempted to access a negative memory cell")
             }
         }
     }

@@ -7,9 +7,17 @@ mod error;
 pub mod memory;
 mod operation;
 
-pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
+pub fn parse(file: &mut Vec<u8>, is_loop: bool) -> Result<VecDeque<Operation>, TmiError> {
     let mut ops: VecDeque<Operation> = VecDeque::new();
-    while !file.is_empty() {
+
+    loop {
+        if file.is_empty() {
+            return if is_loop {
+                Err(TmiError::UnmatchedLoopOpen)
+            } else {
+                Ok(ops)
+            }
+        }
         let cmd = file.remove(0);
         match cmd {
             b'>' => ops.push_back(Operation::ShiftR),
@@ -18,32 +26,15 @@ pub fn parse(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
             b'-' => ops.push_back(Operation::Dec),
             b'.' => ops.push_back(Operation::Access),
             b',' => ops.push_back(Operation::Set),
-            b'[' => ops.push_back(Operation::Loop(parse_loop(file)?)),
-            b']' => return Err(TmiError::UnmatchedLoopClose),
+            b'[' => ops.push_back(Operation::Loop(parse(file, true)?)),
+            b']' => {
+                return if is_loop {
+                    Ok(ops)
+                } else {
+                    Err(TmiError::UnmatchedLoopClose)
+                }
+            },
             _ => (),
         }
     }
-    Ok(ops)
-}
-
-fn parse_loop(file: &mut Vec<u8>) -> Result<VecDeque<Operation>, TmiError> {
-    let mut ops: VecDeque<Operation> = VecDeque::new();
-    let mut cmd = file.remove(0);
-    while cmd != b']' {
-        match cmd {
-            b'>' => ops.push_back(Operation::ShiftR),
-            b'<' => ops.push_back(Operation::ShiftL),
-            b'+' => ops.push_back(Operation::Inc),
-            b'-' => ops.push_back(Operation::Dec),
-            b'.' => ops.push_back(Operation::Access),
-            b',' => ops.push_back(Operation::Set),
-            b'[' => ops.push_back(Operation::Loop(parse_loop(file)?)),
-            _ => (),
-        };
-        if file.is_empty() {
-            return Err(TmiError::UnmatchedLoopOpen);
-        }
-        cmd = file.remove(0);
-    }
-    Ok(ops)
 }

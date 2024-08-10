@@ -19,20 +19,11 @@ impl Operation {
                 print!("{}", mem.access()? as char);
                 Ok(())
             }
-            Operation::Set => {
-                mem.set(input.pop_front().unwrap_or_default());
-                Ok(())
-            }
+            Operation::Set => mem.set(input.pop_front().unwrap_or_default()),
             Operation::ShiftL => mem.shiftl(),
             Operation::ShiftR => mem.shiftr(),
-            Operation::Inc => {
-                mem.inc();
-                Ok(())
-            }
-            Operation::Dec => {
-                mem.dec();
-                Ok(())
-            }
+            Operation::Inc => mem.inc(),
+            Operation::Dec => mem.dec(),
             Operation::Loop(ops) => {
                 while mem.access()? != 0 {
                     for op in ops {
