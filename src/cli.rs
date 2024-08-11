@@ -17,6 +17,9 @@ pub struct CArgs {
     /// cell size in bits (integer or unsigned)
     #[arg(value_enum, short, long, default_value_t = Cells::U8)]
     pub cells: Cells,
+    /// print debugging information
+    #[arg(short, long)]
+    pub debug: bool,
 }
 
 #[derive(Clone, ValueEnum)]

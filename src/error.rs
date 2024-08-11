@@ -1,8 +1,9 @@
 #[derive(Debug)]
 pub enum TmiError {
-    MemoryAccessU8ConversionError,
     UnmatchedLoopClose,
     UnmatchedLoopOpen,
+    FileAccessError,
+    MemoryAccessU8ConversionError,
     MemoryLimitExceeded,
     MemoryUnderflow,
 }
@@ -10,8 +11,8 @@ pub enum TmiError {
 impl std::fmt::Display for TmiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            TmiError::MemoryAccessU8ConversionError => {
-                write!(f, "runtime error: cell value could not be converted to an unsigned 8-bit int to print")
+            TmiError::FileAccessError => {
+                write!(f, "parsing error: source code file could not be read")
             }
             TmiError::UnmatchedLoopClose => {
                 write!(
@@ -25,12 +26,21 @@ impl std::fmt::Display for TmiError {
                     "parsing error: a '[' without a corresponding ']' was found"
                 )
             }
+            TmiError::MemoryAccessU8ConversionError => {
+                write!(
+                    f,
+                    "runtime error: cell value could not be interpreted to print"
+                )
+            }
             TmiError::MemoryLimitExceeded => {
                 write!(f, "runtime error: the memory limit has been exceeded")
             }
 
             TmiError::MemoryUnderflow => {
-                write!(f, "runtime error: the program attempted to access a negative memory cell")
+                write!(
+                    f,
+                    "runtime error: the program attempted to access a negative memory cell"
+                )
             }
         }
     }

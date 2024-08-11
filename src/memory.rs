@@ -1,10 +1,11 @@
-
 use crate::error::TmiError;
 use num::traits::{WrappingAdd, WrappingSub};
 use num::{FromPrimitive, Integer, ToPrimitive};
+use std::char::from_u32;
 
 pub trait Memory {
-    fn access(&self) -> Result<u8, TmiError>;
+    fn access(&self) -> Result<char, TmiError>;
+    fn is_zero(&self) -> Result<bool, TmiError>;
     fn set(&mut self, val: u8) -> Result<(), TmiError>;
     fn shiftl(&mut self) -> Result<(), TmiError>;
     fn shiftr(&mut self) -> Result<(), TmiError>;
@@ -13,7 +14,9 @@ pub trait Memory {
 }
 
 pub trait Cell:
-    ToPrimitive + FromPrimitive + WrappingAdd + WrappingSub + Integer + std::fmt::Display + Clone {}
+    ToPrimitive + FromPrimitive + WrappingAdd + WrappingSub + Integer + std::fmt::Display + Clone
+{
+}
 impl<
         T: ToPrimitive
             + FromPrimitive
@@ -22,7 +25,9 @@ impl<
             + Integer
             + std::fmt::Display
             + Clone,
-    > Cell for T {}
+    > Cell for T
+{
+}
 
 pub struct Mem<T: Cell> {
     cells: Vec<T>,
@@ -48,15 +53,21 @@ impl<T: Cell> Mem<T> {
                 finite: false,
             }
         }
-
     }
 }
 
 impl<T: Cell> Memory for Mem<T> {
-    fn access(&self) -> Result<u8, TmiError> {
-        self.cells[self.pos]
-            .to_u8()
-            .ok_or(TmiError::MemoryAccessU8ConversionError)
+    fn access(&self) -> Result<char, TmiError> {
+        from_u32(
+            self.cells[self.pos]
+                .to_u32()
+                .ok_or(TmiError::MemoryAccessU8ConversionError)?,
+        )
+        .ok_or(TmiError::MemoryAccessU8ConversionError)
+    }
+
+    fn is_zero(&self) -> Result<bool, TmiError> {
+        Ok(self.cells[self.pos].is_zero())
     }
 
     fn set(&mut self, val: u8) -> Result<(), TmiError> {
@@ -65,7 +76,7 @@ impl<T: Cell> Memory for Mem<T> {
     }
     fn shiftl(&mut self) -> Result<(), TmiError> {
         if self.pos == 0 {
-            return Err(TmiError::MemoryUnderflow);
+            return Err(TmiError::MemoryLimitExceeded);
         }
         self.pos -= 1;
         Ok(())

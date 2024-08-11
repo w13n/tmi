@@ -16,7 +16,7 @@ impl Operation {
     pub fn execute(&self, mem: &mut dyn Memory, input: &mut VecDeque<u8>) -> Result<(), TmiError> {
         match self {
             Operation::Access => {
-                print!("{}", mem.access()? as char);
+                print!("{}", mem.access()?);
                 Ok(())
             }
             Operation::Set => mem.set(input.pop_front().unwrap_or_default()),
@@ -25,7 +25,7 @@ impl Operation {
             Operation::Inc => mem.inc(),
             Operation::Dec => mem.dec(),
             Operation::Loop(ops) => {
-                while mem.access()? != 0 {
+                while !mem.is_zero()? {
                     for op in ops {
                         op.execute(mem, input)?
                     }
